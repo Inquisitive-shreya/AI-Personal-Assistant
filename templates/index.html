@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Assistant</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+    <h1>AI Assistant</h1>
+    <p>How can I help you today?</p>
+    <img class="robot" src="https://cdn-icons-png.flaticon.com/512/4712/4712109.png" alt="AI Robot">
+</div>
+
+<!-- Ask Anything -->
+<div class="card">
+    <h3>💬 Ask Anything</h3>
+    <form id="askForm">
+        <input type="text" id="question" name="question" placeholder="Ask a question...">
+        <button type="submit">Ask</button>
+    </form>
+
+    <h3>🧠 Response</h3>
+    <div class="response" id="ask-response">
+        Your response will appear here...
+    </div>
+</div>
+
+<!-- Summarize Email -->
+<div class="card">
+    <h3>📧 Summarize Email</h3>
+    <form id="emailForm">
+        <textarea id="email" name="email" rows="4" placeholder="Paste email text..."></textarea>
+        <button type="submit">Summarize</button>
+    </form>
+
+    <h3>🧠 Response</h3>
+    <div class="response" id="email-response">
+        Email summary will appear here...
+    </div>
+</div>
+
+<!-- Upload Document -->
+<div class="card">
+    <h3>📄 Upload Document</h3>
+    <form id="documentForm">
+        <input type="file" id="file" name="document" accept=".txt,.pdf,.doc,.docx">
+        <button type="submit">Upload & Summarize</button>
+    </form>
+
+    <h3>🧠 Response</h3>
+    <div class="response" id="doc-response">
+        Document summary will appear here...
+    </div>
+</div>
+
+<!-- <div class="card">
+    <h3>🧠 Response</h3>
+    <div class="response" id="response">
+        Your response will appear here...
+    </div>
+</div> -->
+
+</div>
+
+<script>
+document.getElementById("askForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    let question = document.getElementById("question").value
+    document.getElementById("ask-response").innerHTML = "Thinking...";
+
+    let formData = new FormData()
+    formData.append("question", question)
+
+    let res = await fetch("/ask", {
+        method: "POST",
+        body: formData
+    });
+
+    let data = await res.json()
+    document.getElementById("ask-response").innerHTML = data.response
+};
+
+
+document.getElementById("emailForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    let email = document.getElementById("email").value
+    document.getElementById("email-response").innerHTML = "Summarizing...";
+
+    let formData = new FormData()
+    formData.append("email", email)
+
+    let res = await fetch("/summarize", {
+        method: "POST",
+        body: formData
+    });
+
+    let data = await res.json()
+    document.getElementById("email-response").innerHTML = data.response
+};
+
+
+document.getElementById("documentForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    let fileInput = document.getElementById("file")
+    let file = fileInput.files[0]
+
+    if (!file) {
+        alert("Please select a file first")
+        return
+    }
+
+    document.getElementById("doc-response").innerHTML = "Uploading & summarizing...";
+
+    let formData = new FormData()
+    formData.append("document", file)
+
+    let res = await fetch("/summarize-document", {
+        method: "POST",
+        body: formData
+    });
+
+    let data = await res.json()
+    document.getElementById("doc-response").innerHTML = data.response
+};
+</script>
+
+</body>
+</html>
